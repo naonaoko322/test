@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Диана!! 💜</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: linear-gradient(160deg, #f3e8ff 0%, #ffe8f3 50%, #e8f1ff 100%);
+    color: #3d2b4f; padding: 28px 16px 60px;
+    display: flex; justify-content: center; overflow-x: hidden;
+  }
+  .app { width: 100%; max-width: 560px; position: relative; z-index: 1; }
+  .screen { display: none; }
+  .screen.active { display: block; animation: appear .45s ease; }
+  @keyframes appear { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  h1 { font-size: clamp(24px, 6vw, 32px); margin: 0 0 12px; color: #7b3fa0; }
+  h2 { font-size: clamp(20px, 5vw, 26px); margin: 0 0 14px; color: #7b3fa0; }
+  p { line-height: 1.6; margin: 0 0 16px; }
+  .center { text-align: center; }
+
+  .btn {
+    border: 0; cursor: pointer; padding: 14px 28px; border-radius: 999px;
+    background: linear-gradient(135deg, #a86bd6, #e05a9b); color: #fff;
+    font-weight: 700; font-size: 16px; font-family: inherit;
+    box-shadow: 0 10px 24px rgba(160, 80, 170, .3); transition: transform .2s, box-shadow .2s; margin: 6px;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(160, 80, 170, .4); }
+  .btn:active { transform: scale(.97); }
+  .btn.ghost { background: #fff; color: #a8458a; box-shadow: 0 8px 20px rgba(160, 80, 170, .18); }
+  .btn.no { background: #fff; color: #7a6a8a; box-shadow: 0 8px 20px rgba(120, 90, 150, .15); }
+  .btn.secret {
+    display: block; margin: 20px auto 10px; padding: 10px 20px; font-size: 13px;
+    letter-spacing: 1px; text-transform: uppercase;
+    background: linear-gradient(135deg, #ffd76b, #ff9a5a);
+    box-shadow: 0 8px 22px rgba(255, 154, 90, .45);
+    animation: glow 2s ease-in-out infinite;
+  }
+  @keyframes glow { 0%, 100% { box-shadow: 0 8px 22px rgba(255, 154, 90, .45); } 50% { box-shadow: 0 8px 30px rgba(255, 154, 90, .85); } }
+
+  .cat { font-size: 92px; line-height: 1; display: inline-block; margin-bottom: 12px; }
+  .cat.cute { animation: bounce 1.4s ease-in-out infinite; }
+  @keyframes bounce { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.06); } }
+  .angry-text { font-size: clamp(22px, 6vw, 28px); font-weight: 800; color: #d6336c; margin: 0 0 10px; }
+
+  .card {
+    background: rgba(255, 255, 255, .75); border: 1px solid rgba(168, 107, 214, .25);
+    border-radius: 28px; padding: 30px 22px; box-shadow: 0 18px 50px rgba(140, 80, 170, .15);
+  }
+  .small { font-size: 12px; color: #9a7ab0; }
+
+  .photo { width: 220px; height: 220px; object-fit: cover; border-radius: 24px; border: 5px solid #fff; box-shadow: 0 14px 34px rgba(160, 80, 170, .28); margin: 0 auto 18px; display: block; background: #f3e8ff; }
+  .photo.start { width: 260px; height: 260px; border-radius: 28px; }
+  .photo.wide { width: 100%; height: 240px; border-radius: 22px; border-width: 4px; }
+
+  .strike { text-decoration: line-through; color: #b9a7c8; font-size: 13px; }
+  .spoiler { display: inline-block; background: #e3d3f0; color: transparent; border-radius: 6px; padding: 0 6px; cursor: pointer; transition: .3s; user-select: none; }
+  .spoiler:hover { background: #d1b8e8; }
+  .spoiler.open { background: #fff0f6; color: #d6336c; font-weight: 700; }
+
+  .hint { position: relative; border-bottom: 1px dashed #c49ae0; cursor: help; color: #a8458a; font-weight: 600; }
+  .hint .tip { position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%) translateY(6px); background: #3d2b4f; color: #fff; font-size: 12px; line-height: 1.4; padding: 10px 14px; border-radius: 12px; width: 220px; text-align: center; opacity: 0; pointer-events: none; transition: .3s; z-index: 10; box-shadow: 0 10px 26px rgba(60, 40, 80, .35); }
+  .hint .tip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 7px solid transparent; border-top-color: #3d2b4f; }
+  .hint:hover .tip { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .confetti-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+  .confetti { position: absolute; bottom: -40px; animation: floatUp linear forwards; }
+  @keyframes floatUp { to { transform: translateY(-115vh) rotate(360deg); opacity: 0; } }
+</style>
+</head>
+<body>
+
+<div class="confetti-layer" id="confetti-layer"></div>
+
+<!-- АУДИО -->
+<audio id="bg-main" src="main.mp3" loop preload="auto"></audio>
+<audio id="bg-no" src="no.mp3" loop preload="auto"></audio>
+<audio id="bg-secret" src="secret.mp3" loop preload="auto"></audio>
+<audio id="tap-yes" src="tap_yes.mp3" preload="auto"></audio>
+<audio id="tap-no" src="tap_no.mp3" preload="auto"></audio>
+<audio id="tap-secret" src="tap_secret.mp3" preload="auto"></audio>
+
+<div class="app">
+  <section class="screen active" id="s1">
+    <div class="card center">
+      <img class="photo start" src="https://i.pinimg.com/1200x/54/6f/59/546f597d0e87070cd4638d4c5f8f8495.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <div class="cat cute" style="display:none">😺</div>
+      <h1>Диана!!</h1>
+      <h2>Ты моя лучшая подружка?</h2>
+      
+      <p style="margin-top:10px; font-size:13px; color:#a8458a; font-weight:bold;">
+        👇 Нажми сюда, чтобы включить музыку 👇
+      </p>
+      <button class="btn ghost" style="font-size:14px; padding:10px 20px; margin-bottom:10px;" onclick="unlockAudio()">
+        🎵 Включить звук
+      </button>
+
+      <p>
+        <button class="btn" onclick="action('sYes', 'tap-yes')">Да 🥰</button>
+        <button class="btn no" onclick="action('sNo', 'tap-no')">Нет 😼</button>
+      </p>
+    </div>
+  </section>
+
+  <section class="screen" id="sNo">
+    <div class="card center">
+      <img class="photo wide" src="https://i.pinimg.com/736x/f1/43/c8/f143c875aacea6cccd8cf88ce29e0278.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <div class="cat angry" style="display:none">😾</div>
+      <p class="angry-text">Ты охуела, плесень???</p>
+      <p>Так, стоп. Давай ещё раз. Подумай хорошенько 😤</p>
+      <button class="btn ghost" style="margin-top:12px" onclick="action('s1', 'tap-yes')">Передумать 🙈</button>
+    </div>
+  </section>
+
+  <section class="screen" id="sYes">
+    <div class="card center">
+      <img class="photo" src="https://i.pinimg.com/736x/5b/de/a9/5bdea91c1f25931c5d74ad49a57fb1df.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <div class="cat cute" style="display:none">😻</div>
+      <h1>Я знала!! 💜</h1>
+      <p>Ты самая-самая лучшая, я тебя обожаю 🥺</p>
+      <hr style="border:0; border-top:1px dashed #e3d3f0; margin:22px 0;">
+      <h2>С днём рождения, Диана! 🎂</h2>
+      <p>Спасибо, что ты есть.<br>С тобой смешно, тепло и совсем не страшно жить.<br>Ты делаешь мой мир намного добрее —<br>просто тем, что ты рядом.</p>
+      <p>Пусть этот год будет к тебе мягким:<br>много радости, вкусной еды, спонтанных поездок<br>и людей, которые тебя ценят так же, как я 💫</p>
+      <p class="small" style="margin-top:24px">Обнимаю крепко-крепко,<br><b style="font-size:18px; color:#a8458a">твоя Наташа</b></p>
+      <button class="btn secret" onclick="action('sSecret', 'tap-secret')">🤫 секрет</button>
+      <button class="btn ghost" style="margin-top:14px" onclick="action('s1', 'tap-yes')">Посмотреть ещё раз 🔁</button>
+    </div>
+  </section>
+
+  <section class="screen" id="sSecret">
+    <div class="card center">
+      <img class="photo" src="https://i.pinimg.com/736x/34/dd/61/34dd61c5a976e6f467e30a79548d7ac3.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+      <div class="cat cute" style="display:none">🤫</div>
+      <h2>Только для тебя 💌</h2>
+      <p>Диана, я долго думала, что тебе написать.<br>И поняла: никакие слова не передадут,<br>как сильно я рада, что ты у меня есть.</p>
+      <p>Ты — человек, рядом с которым можно быть собой.<br>Смешной, уставшей, странной, любой.<br>И ты всё равно останешься рядом.</p>
+      <p><span class="strike">Люблю Москву, но заебали все московские шалости....</span></p>
+      <p>Я хочу, чтобы этот год был к тебе <span class="hint">добрым<span class="tip">Рюк всегда рядом. 😌</span></span>.<br>Чтобы ты просыпалась и думала: «как же хорошо».<br>Чтобы рядом были люди, которые тебя ценят.<br>И чтобы ты никогда <span class="hint">не сомневалась в себе<span class="tip">Извините, пожалуйста, я вам не родственник оказывается</span></span>.</p>
+      <p><span class="spoiler" data-text="СИКС СЕВЕН">нажми сюда</span></p>
+      <p>А если вдруг станет грустно —<br>вспомни, что есть я.<br><span class="spoiler" data-text="ты не бойся ночи 💜">нажми сюда</span></p>
+      <p>С днём рождения, моя любимая.<br>Я тебя очень-очень люблю. 💜</p>
+      <button class="btn ghost" style="margin-top:14px" onclick="action('sYes', 'tap-yes')">Назад</button>
+    </div>
+  </section>
+</div>
+
+<script>
+  const sounds = {
+    tapYes: document.getElementById('tap-yes'),
+    tapNo: document.getElementById('tap-no'),
+    tapSec: document.getElementById('tap-secret'),
+    bgMain: document.getElementById('bg-main'),
+    bgNo: document.getElementById('bg-no'),
+    bgSec: document.getElementById('bg-secret'),
+  };
+
+  // ЭТА ФУНКЦИЯ РАЗБЛОКИРУЕТ ЗВУК В БРАУЗЕРЕ
+  function unlockAudio() {
+    let audio = new Audio('tap_yes.mp3');
+    audio.volume = 0.1; // еле слышно
+    audio.play().then(() => {
+      alert('Музыка включена! Теперь нажимай на кнопки 🥰');
+    }).catch(() => {
+      alert('Браузер всё равно ругается. Попробуй открыть в Chrome или Safari.');
+    });
+  }
+
+  function playTap(audio) {
+    if (!audio) return;
+    audio.volume = 0.5; 
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+    setTimeout(() => { audio.pause(); audio.currentTime = 0; }, 1000); 
+  }
+
+  function stopAllBg() {
+    Object.values(sounds).forEach(audio => {
+      if (audio) { audio.pause(); audio.currentTime = 0; }
+    });
+  }
+
+  function action(screenId, tapId) {
+    if (tapId === 'tap-yes') playTap(sounds.tapYes);
+    if (tapId === 'tap-no') playTap(sounds.tapNo);
+    if (tapId === 'tap-secret') playTap(sounds.tapSec);
+
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    stopAllBg(); 
+    
+    if (screenId === 'sYes') {
+      confetti();
+      if(sounds.bgMain) {
+        sounds.bgMain.volume = 0.25; 
+        sounds.bgMain.play().catch(() => {});
+      }
+    } 
+    else if (screenId === 'sNo') {
+      if(sounds.bgNo) {
+        sounds.bgNo.volume = 0.25;
+        sounds.bgNo.play().catch(() => {});
+      }
+    } 
+    else if (screenId === 'sSecret') {
+      if(sounds.bgSec) {
+        sounds.bgSec.volume = 0.25;
+        sounds.bgSec.play().catch(() => {});
+      }
+    }
+  }
+
+  function confetti() {
+    const layer = document.getElementById('confetti-layer');
+    const symbols = ['💜', '💖', '✨', '🌸', '💫', '🎉', '🐱'];
+    for (let i = 0; i < 34; i++) {
+      const el = document.createElement('span');
+      el.className = 'confetti';
+      el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.fontSize = 16 + Math.random() * 20 + 'px';
+      el.style.animationDuration = 4 + Math.random() * 5 + 's';
+      el.style.animationDelay = Math.random() * 1.5 + 's';
+      layer.appendChild(el);
+      setTimeout(() => el.remove(), 11000);
+    }
+  }
+
+  document.querySelectorAll('.spoiler').forEach(el => {
+    const secret = el.dataset.text || 'секрет';
+    const closed = el.textContent;
+    el.addEventListener('click', () => {
+      el.textContent = el.classList.contains('open') ? closed : secret;
+      el.classList.toggle('open');
+    });
+  });
+</script>
+
+</body>
+</html>
