@@ -92,12 +92,12 @@
       <div class="cat cute" style="display:none">😺</div>
       <h1>Диана!!</h1>
       <h2>Ты моя лучшая подружка?</h2>
-
+      
       <p style="margin-top:15px; font-size:14px; color:#d6336c; font-weight:bold; font-family: 'Comic Sans MS', cursive;">
         🐾 Няя~ нажми на кнопочку, чтобы всё заиграло 🎶✨
       </p>
       
-      <div style="margin: 15px 0;">
+      <div style="margin: 15px 0;" id="audio-btn-container">
         <button class="btn ghost" style="font-size:14px; padding:10px 20px;" onclick="unlockAudio()">
           🎵 Включить звук
         </button>
@@ -166,7 +166,6 @@
 
   let isUnlocked = false;
 
-  // Разблокировка звука
   function unlockAudio() {
     if (isUnlocked) return;
     isUnlocked = true;
@@ -184,9 +183,14 @@
         audio.currentTime = 0;
       }).catch(() => {});
     });
+
+    // Меняем кнопку на кавайный текст
+    const container = document.getElementById('audio-btn-container');
+    if (container) {
+      container.innerHTML = '<span style="font-size:16px; color:#d6336c; font-weight:bold; font-family: \'Comic Sans MS\', cursive; animation: appear .5s ease;">~Мхм, хорошая девочка~ 💕</span>';
+    }
   }
 
-  // Просто запускаем звук клика. Без обрезания!
   function playTap(audio) {
     if (!audio) return;
     audio.volume = 0.6; 
@@ -201,7 +205,6 @@
   }
 
   function action(screenId, tapId) {
-    // Клик
     if (tapId === 'tap-yes') playTap(sounds.tapYes);
     if (tapId === 'tap-no') playTap(sounds.tapNo);
     if (tapId === 'tap-secret') playTap(sounds.tapSec);
@@ -212,7 +215,6 @@
 
     stopAllBg(); 
     
-    // Фоновая музыка
     if (screenId === 'sYes') {
       confetti();
       if(sounds.bgMain) {
