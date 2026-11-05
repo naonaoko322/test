@@ -83,6 +83,7 @@
 <audio id="tap-yes" src="tap_yes.mp3" preload="auto"></audio>
 <audio id="tap-no" src="tap_no.mp3" preload="auto"></audio>
 <audio id="tap-secret" src="tap_secret.mp3" preload="auto"></audio>
+<audio id="hack-player" src="tap_yes.mp3" preload="auto"></audio>
 
 <div class="app">
   <section class="screen active" id="s1">
@@ -92,12 +93,11 @@
       <h1>Диана!!</h1>
       <h2>Ты моя лучшая подружка?</h2>
       
-      <p style="margin-top:10px; font-size:13px; color:#a8458a; font-weight:bold;">
-        👇 Нажми сюда, чтобы включить музыку 👇
-      </p>
-      <button class="btn ghost" style="font-size:14px; padding:10px 20px; margin-bottom:10px;" onclick="unlockAudio()">
-        🎵 Включить звук
-      </button>
+      <div style="margin: 15px 0;">
+        <button class="btn ghost" style="font-size:14px; padding:10px 20px;" onclick="unlockAudio()">
+          🎵 Включить звук
+        </button>
+      </div>
 
       <p>
         <button class="btn" onclick="action('sYes', 'tap-yes')">Да 🥰</button>
@@ -139,7 +139,7 @@
       <h2>Только для тебя 💌</h2>
       <p>Диана, я долго думала, что тебе написать.<br>И поняла: никакие слова не передадут,<br>как сильно я рада, что ты у меня есть.</p>
       <p>Ты — человек, рядом с которым можно быть собой.<br>Смешной, уставшей, странной, любой.<br>И ты всё равно останешься рядом.</p>
-      <p><span class="strike">Люблю Москву, но заебали все московские шалости....</span></p>
+      <p><span class="strike">Люблю Москву, но заебали все московские шалавы....</span></p>
       <p>Я хочу, чтобы этот год был к тебе <span class="hint">добрым<span class="tip">Рюк всегда рядом. 😌</span></span>.<br>Чтобы ты просыпалась и думала: «как же хорошо».<br>Чтобы рядом были люди, которые тебя ценят.<br>И чтобы ты никогда <span class="hint">не сомневалась в себе<span class="tip">Извините, пожалуйста, я вам не родственник оказывается</span></span>.</p>
       <p><span class="spoiler" data-text="СИКС СЕВЕН">нажми сюда</span></p>
       <p>А если вдруг станет грустно —<br>вспомни, что есть я.<br><span class="spoiler" data-text="ты не бойся ночи 💜">нажми сюда</span></p>
@@ -157,34 +157,47 @@
     bgMain: document.getElementById('bg-main'),
     bgNo: document.getElementById('bg-no'),
     bgSec: document.getElementById('bg-secret'),
+    hack: document.getElementById('hack-player')
   };
 
-  // ЭТА ФУНКЦИЯ РАЗБЛОКИРУЕТ ЗВУК В БРАУЗЕРЕ
+  let isUnlocked = false;
+
+  // Разблокировка звука
   function unlockAudio() {
-    let audio = new Audio('tap_yes.mp3');
-    audio.volume = 0.1; // еле слышно
-    audio.play().then(() => {
-      alert('Музыка включена! Теперь нажимай на кнопки 🥰');
-    }).catch(() => {
-      alert('Браузер всё равно ругается. Попробуй открыть в Chrome или Safari.');
+    if (isUnlocked) return;
+    isUnlocked = true;
+    
+    // Проигрываем "мяу", чтобы разблокировать
+    sounds.hack.volume = 0.5;
+    sounds.hack.play().catch(() => {});
+    
+    // Разблокируем все остальные треки беззвучно
+    Object.values(sounds).forEach(audio => {
+      if (!audio) return;
+      audio.volume = 0;
+      audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+      }).catch(() => {});
     });
   }
 
+  // Просто запускаем звук клика. Без обрезания!
   function playTap(audio) {
     if (!audio) return;
-    audio.volume = 0.5; 
+    audio.volume = 0.6; 
     audio.currentTime = 0;
     audio.play().catch(() => {});
-    setTimeout(() => { audio.pause(); audio.currentTime = 0; }, 1000); 
   }
 
   function stopAllBg() {
-    Object.values(sounds).forEach(audio => {
+    [sounds.bgMain, sounds.bgNo, sounds.bgSec].forEach(audio => {
       if (audio) { audio.pause(); audio.currentTime = 0; }
     });
   }
 
   function action(screenId, tapId) {
+    // Клик
     if (tapId === 'tap-yes') playTap(sounds.tapYes);
     if (tapId === 'tap-no') playTap(sounds.tapNo);
     if (tapId === 'tap-secret') playTap(sounds.tapSec);
@@ -195,6 +208,7 @@
 
     stopAllBg(); 
     
+    // Фоновая музыка
     if (screenId === 'sYes') {
       confetti();
       if(sounds.bgMain) {
