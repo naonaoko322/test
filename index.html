@@ -32,7 +32,12 @@
   .btn:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(160, 80, 170, .4); }
   .btn:active { transform: scale(.97); }
   .btn.ghost { background: #fff; color: #a8458a; box-shadow: 0 8px 20px rgba(160, 80, 170, .18); }
-  .btn.no { background: #fff; color: #7a6a8a; box-shadow: 0 8px 20px rgba(120, 90, 150, .15); }
+  
+  .btn.no { 
+    background: #fff; color: #7a6a8a; box-shadow: 0 8px 20px rgba(120, 90, 150, .15);
+    position: relative; transition: transform 0.3s ease, opacity 0.3s;
+  }
+
   .btn.secret {
     display: block; margin: 20px auto 10px; padding: 10px 20px; font-size: 13px;
     letter-spacing: 1px; text-transform: uppercase;
@@ -70,20 +75,50 @@
   .confetti-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
   .confetti { position: absolute; bottom: -40px; animation: floatUp linear forwards; }
   @keyframes floatUp { to { transform: translateY(-115vh) rotate(360deg); opacity: 0; } }
+
+  /* Огромный злой текст на фоне */
+  .evil-bg-text {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 15vw; font-weight: 900; color: rgba(214, 51, 108, 0.1);
+    pointer-events: none; z-index: 0; white-space: nowrap; text-transform: uppercase;
+    font-family: 'Impact', sans-serif; letter-spacing: 5px;
+    animation: shakeBg 0.5s infinite;
+  }
+  @keyframes shakeBg {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    25% { transform: translate(-48%, -52%) rotate(2deg); }
+    50% { transform: translate(-52%, -48%) rotate(-2deg); }
+    75% { transform: translate(-50%, -50%) rotate(1deg); }
+    100% { transform: translate(-50%, -50%) rotate(0deg); }
+  }
+
+  /* Стиль для летающих злых фраз */
+  .flying-text {
+    position: absolute;
+    color: #d6336c;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-family: 'Impact', sans-serif;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+    text-shadow: 2px 2px 0px #fff;
+  }
 </style>
 </head>
 <body>
 
 <div class="confetti-layer" id="confetti-layer"></div>
 
-<!-- АУДИО -->
+<!-- Огромный текст на фоне -->
+<div id="evil-bg" class="evil-bg-text" style="display:none;">УЖАС</div>
+
 <audio id="bg-main" src="main.mp3" loop preload="auto"></audio>
 <audio id="bg-no" src="no.mp3" loop preload="auto"></audio>
 <audio id="bg-secret" src="secret.mp3" loop preload="auto"></audio>
 <audio id="tap-yes" src="tap_yes.mp3" preload="auto"></audio>
 <audio id="tap-no" src="tap_no.mp3" preload="auto"></audio>
 <audio id="tap-secret" src="tap_secret.mp3" preload="auto"></audio>
-<audio id="hack-player" src="tap_yes.mp3" preload="auto"></audio>
 
 <div class="app">
   <section class="screen active" id="s1">
@@ -93,25 +128,15 @@
       <h1>Диана!!</h1>
       <h2>Ты моя лучшая подружка?</h2>
       
-      <p style="margin-top:15px; font-size:14px; color:#d6336c; font-weight:bold; font-family: 'Comic Sans MS', cursive;">
-        🐾 Няя~ нажми на кнопочку, чтобы всё заиграло 🎶✨
-      </p>
-      
-      <div style="margin: 15px 0;" id="audio-btn-container">
-        <button class="btn ghost" style="font-size:14px; padding:10px 20px;" onclick="unlockAudio()">
-          🎵 Включить звук
-        </button>
-      </div>
-
-      <p>
+      <p style="margin-top:20px">
         <button class="btn" onclick="action('sYes', 'tap-yes')">Да 🥰</button>
-        <button class="btn no" onclick="action('sNo', 'tap-no')">Нет 😼</button>
+        <button class="btn no" id="no-btn" onclick="noClick()">Нет 😼</button>
       </p>
     </div>
   </section>
 
   <section class="screen" id="sNo">
-    <div class="card center">
+    <div class="card center" style="background: rgba(255, 235, 240, 0.9); border-color: #ff99b3;">
       <img class="photo wide" src="https://i.pinimg.com/736x/f1/43/c8/f143c875aacea6cccd8cf88ce29e0278.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
       <div class="cat angry" style="display:none">😾</div>
       <p class="angry-text">Ты охуела, плесень???</p>
@@ -144,7 +169,7 @@
       <p>Диана, я долго думала, что тебе написать.<br>И поняла: никакие слова не передадут,<br>как сильно я рада, что ты у меня есть.</p>
       <p>Ты — человек, рядом с которым можно быть собой.<br>Смешной, уставшей, странной, любой.<br>И ты всё равно останешься рядом.</p>
       <p><span class="strike">Люблю Москву, но заебали все московские шалавы....</span></p>
-      <p>Я хочу, чтобы этот год был к тебе <span class="hint">добрым<span class="tip">Рюк всегда рядом. 😌</span></span>.<br>Чтобы ты просыпалась и думала: «как же хорошо».<br>Чтобы рядом были люди, которые тебя ценят.<br>И чтобы ты никогда <span class="hint">не сомневалась в себе<span class="tip">Извините, пожалуйста, я вам не родственник оказывается</span></span>.</p>
+      <p>Я хочу, чтобы этот год был к тебе <span class="hint">добрым <span class="tip">Рюк всегда рядом. 😌</span></span>.<br>Чтобы ты просыпалась и думала: «как же хорошо».<br>Чтобы рядом были люди, которые тебя ценят.<br>И чтобы ты никогда <span class="hint">не сомневалась в себе <span class="tip">Извините, пожалуйста, я вам не родственник оказывается</span></span>.</p>
       <p><span class="spoiler" data-text="СИКС СЕВЕН">нажми сюда</span></p>
       <p>А если вдруг станет грустно —<br>вспомни, что есть я.<br><span class="spoiler" data-text="ты не бойся ночи 💜">нажми сюда</span></p>
       <p>С днём рождения, моя любимая.<br>Я тебя очень-очень люблю. 💜</p>
@@ -160,36 +185,8 @@
     tapSec: document.getElementById('tap-secret'),
     bgMain: document.getElementById('bg-main'),
     bgNo: document.getElementById('bg-no'),
-    bgSec: document.getElementById('bg-secret'),
-    hack: document.getElementById('hack-player')
+    bgSec: document.getElementById('bg-secret')
   };
-
-  let isUnlocked = false;
-
-  function unlockAudio() {
-    if (isUnlocked) return;
-    isUnlocked = true;
-    
-    // Проигрываем "мяу", чтобы разблокировать
-    sounds.hack.volume = 0.5;
-    sounds.hack.play().catch(() => {});
-    
-    // Разблокируем все остальные треки беззвучно
-    Object.values(sounds).forEach(audio => {
-      if (!audio) return;
-      audio.volume = 0;
-      audio.play().then(() => {
-        audio.pause();
-        audio.currentTime = 0;
-      }).catch(() => {});
-    });
-
-    // Меняем кнопку на кавайный текст
-    const container = document.getElementById('audio-btn-container');
-    if (container) {
-      container.innerHTML = '<span style="font-size:16px; color:#d6336c; font-weight:bold; font-family: \'Comic Sans MS\', cursive; animation: appear .5s ease;">~Мхм, хорошая девочка~ 💕</span>';
-    }
-  }
 
   function playTap(audio) {
     if (!audio) return;
@@ -213,6 +210,8 @@
     document.getElementById(screenId).classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    document.getElementById('evil-bg').style.display = 'none';
+
     stopAllBg(); 
     
     if (screenId === 'sYes') {
@@ -227,12 +226,92 @@
         sounds.bgNo.volume = 0.25;
         sounds.bgNo.play().catch(() => {});
       }
+      const bg = document.getElementById('evil-bg');
+      bg.style.display = 'block';
+      bg.textContent = 'УБЛЮДОК'; // Сделаем фон чуть короче
+      evilConfetti();
     } 
     else if (screenId === 'sSecret') {
       if(sounds.bgSec) {
         sounds.bgSec.volume = 0.25;
         sounds.bgSec.play().catch(() => {});
       }
+    }
+  }
+
+  let dodgeCount = 0;
+  const noBtn = document.getElementById('no-btn');
+
+  noBtn.addEventListener('mouseover', () => {
+    if (dodgeCount < 3) {
+      const x = (Math.random() - 0.5) * 200;
+      const y = (Math.random() - 0.5) * 200;
+      const scale = 1 - (dodgeCount * 0.15);
+      noBtn.style.transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${x}deg)`;
+      playTap(sounds.tapNo);
+      dodgeCount++;
+      if (dodgeCount === 3) {
+        noBtn.style.transform = 'translate(0, 0) scale(1) rotate(0)';
+        noBtn.innerHTML = 'Ладно, сдаюсь 😞';
+      }
+    }
+  });
+
+  function noClick() {
+    if (dodgeCount < 3) {
+      const x = (Math.random() - 0.5) * 200;
+      const y = (Math.random() - 0.5) * 200;
+      const scale = 1 - (dodgeCount * 0.15);
+      noBtn.style.transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${x}deg)`;
+      playTap(sounds.tapNo);
+      dodgeCount++;
+      if (dodgeCount === 3) {
+        noBtn.style.transform = 'translate(0, 0) scale(1) rotate(0)';
+        noBtn.innerHTML = 'Ладно, сдаюсь 😞';
+      }
+    } else {
+      action('sNo', 'tap-no');
+    }
+  }
+
+  function evilConfetti() {
+    const layer = document.getElementById('confetti-layer');
+    // Разбиваем длинную фразу на куски, чтобы они летали красиво
+    const phrases = [
+      "УБЛЮДОК, МАТЬ ТВОЮ",
+      "А НУ ИДИ СЮДА",
+      "ГОВНО СОБАЧЬЕ",
+      "ТУТ РЕШИЛ КО МНЕ ЛЕЗТЬ ТЫ",
+      "ЗАСРАНЕЦ ВОНЮЧИЙ",
+      "ПОПРОБУЙ МЕНЯ ТРАХНУТЬ",
+      "Я ТЕБЯ САМ ТРАХНУ",
+      "ОНАНИСТ ЧЁРТОВ",
+      "БУДЬ ТЫ ПРОКЛЯТ!!"
+    ];
+
+    for (let i = 0; i < 30; i++) {
+      const el = document.createElement('span');
+      el.className = 'flying-text';
+      el.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+      
+      el.style.left = Math.random() * 80 + 'vw'; // Располагаем по ширине
+      el.style.top = Math.random() * 80 + 'vh';  // И по высоте
+      el.style.fontSize = 16 + Math.random() * 20 + 'px';
+      el.style.transform = `rotate(${Math.random() * 40 - 20}deg)`; // Наклон
+      
+      // Анимация разлетания в стороны и исчезновения
+      el.animate([
+        { opacity: 1, transform: `scale(0.5) rotate(0deg)` },
+        { opacity: 1, transform: `scale(1.2) rotate(${Math.random() * 40 - 20}deg)` },
+        { opacity: 0, transform: `scale(1) rotate(${Math.random() * 40 - 20}deg) translateY(-50px)` }
+      ], {
+        duration: 2000 + Math.random() * 2000,
+        easing: 'ease-out',
+        fill: 'forwards'
+      });
+      
+      layer.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
     }
   }
 
