@@ -243,14 +243,14 @@
   const noBtn = document.getElementById('no-btn');
 
   noBtn.addEventListener('mouseover', () => {
-    if (dodgeCount < 3) {
-      const x = (Math.random() - 0.5) * 200;
-      const y = (Math.random() - 0.5) * 200;
-      const scale = 1 - (dodgeCount * 0.15);
+    if (dodgeCount < 5) {
+      const x = (Math.random() - 0.5) * 350;
+      const y = (Math.random() - 0.5) * 350;
+      const scale = 1 - (dodgeCount * 0.10);
       noBtn.style.transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${x}deg)`;
       playTap(sounds.tapNo);
       dodgeCount++;
-      if (dodgeCount === 3) {
+      if (dodgeCount === 5) {
         noBtn.style.transform = 'translate(0, 0) scale(1) rotate(0)';
         noBtn.innerHTML = 'Ладно, сдаюсь 😞';
       }
@@ -258,14 +258,14 @@
   });
 
   function noClick() {
-    if (dodgeCount < 3) {
-      const x = (Math.random() - 0.5) * 200;
-      const y = (Math.random() - 0.5) * 200;
-      const scale = 1 - (dodgeCount * 0.15);
-      noBtn.style.transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${x}deg)`;
+    if (dodgeCount < 5) {
+      const x = (Math.random() - 0.5) * 350;
+      const y = (Math.random() - 0.5) * 350;
+      const scale = 1 - (dodgeCount * 0.10);
+      noBtn.style.transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${x*2}deg)`;
       playTap(sounds.tapNo);
       dodgeCount++;
-      if (dodgeCount === 3) {
+      if (dodgeCount === 5) {
         noBtn.style.transform = 'translate(0, 0) scale(1) rotate(0)';
         noBtn.innerHTML = 'Ладно, сдаюсь 😞';
       }
